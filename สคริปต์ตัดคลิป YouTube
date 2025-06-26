@@ -1,0 +1,32 @@
+import yt_dlp
+from moviepy.video.io.VideoFileClip import VideoFileClip
+import datetime
+import os
+
+# [1] ลิงก์ YouTube ไฮไลต์ของทีมลิเวอร์พูลล่าสุด
+youtube_url = "https://www.youtube.com/watch?v=xxxxx"  # ใส่ลิงก์จริง
+
+# [2] กำหนดช่วงเวลาในวิดีโอที่ต้องการตัด (นาที:วินาที)
+start_time = 45    # วินาที
+end_time = 150     # วินาที
+
+# [3] ดาวน์โหลดวิดีโอ
+output_file = "raw_clip.mp4"
+ydl_opts = {
+    'format': 'bestvideo+bestaudio',
+    'outtmpl': output_file,
+}
+
+with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+    ydl.download([youtube_url])
+
+# [4] ตัดวิดีโอช่วงเวลาที่ต้องการ
+clip = VideoFileClip(output_file).subclip(start_time, end_time)
+
+# ตั้งชื่อไฟล์ตามวันที่
+today = datetime.datetime.now().strftime("%Y-%m-%d")
+output_cut = f"liverpool_highlight_{today}.mp4"
+clip.write_videofile(output_cut, codec="libx264")
+
+# ลบไฟล์ต้นฉบับ
+os.remove(output_file)
